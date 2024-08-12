@@ -1,0 +1,26 @@
+use hotels;
+db.createCollection('customer');
+
+db.customer.insertMany([
+  { empId: 1, name: 'Clark', dept: 'Sales' },
+  { empId: 2, name: 'Dave', dept: 'Accounting' },
+  { empId: 3, name: 'Ava', dept: 'Sales' }
+]);
+db.customer.find().pretty();
+db.customer.findOne({ empId: 1 });
+db.customer.find({ dept: 'Sales' }).pretty();
+db.customer.updateOne(
+  { empId: 1 },
+  { $set: { dept: 'Marketing' } }
+);
+db.customer.updateMany(
+  { dept: 'Sales' },
+  { $set: { dept: 'Customer Support' } }
+);
+db.customer.replaceOne(
+  { empId: 3 },
+  { empId: 3, name: 'Ava', dept: 'HR' }
+);
+db.customer.deleteOne({ empId: 2 });
+db.customer.deleteMany({ dept: 'Customer Support' });
+db.customer.deleteMany({});
