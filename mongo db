@@ -1,0 +1,89 @@
+db.createCollection('customer');
+
+db.customer.insertMany([
+  { empId: 1, name: 'Clark', dept: 'Sales' },
+  { empId: 2, name: 'Dave', dept: 'Accounting' },
+  { empId: 3, name: 'Ava', dept: 'Sales' }
+]); apply 10 stages related queries
+ db.customer.aggregate([
+  {
+    $match: { dept: 'Sales' }
+  }
+]).pretty();
+ db.customer.aggregate([
+  {
+    $project: {
+      empId: 1,
+      name: 1,
+      _id: 0  
+    }
+  }
+]).pretty();
+ db.customer.aggregate([
+  {
+    $sort: { name: 1 }    }
+]).pretty();
+ db.customer.aggregate([
+  {
+    $group: {
+      _id: "$dept",  
+      totalEmployees: { $sum: 1 } 
+    }
+  }
+]).pretty();
+ db.customer.aggregate([
+  {
+    $count: "totalCustomers"
+  }
+]).pretty();
+ db.customer.aggregate([
+  {
+    $lookup: {
+      from: 'orders',        localField: 'empId',
+      foreignField: 'customerEmpId',
+      as: 'orderDetails'
+    }
+  }
+]).pretty();
+ db.customer.aggregate([
+  {
+    $addFields: {
+      isSalesDept: { $eq: ["$dept", "Sales"] }  }
+  }
+]).pretty();
+ db.customer.aggregate([
+  {
+    $lookup: {
+      from: 'orders',
+      localField: 'empId',
+      foreignField: 'customerEmpId',
+      as: 'orders'
+    }
+  },
+  {
+    $unwind: "$orders" 
+  }
+]).pretty();
+db.customer.aggregate([
+  {
+    $sort: { name: 1 }  
+  },
+  {
+    $limit: 2 
+  }
+]).pretty();
+ db.customer.aggregate([
+  {
+    $group: {
+      _id: "$dept",
+      totalEmployees: { $sum: 1 }
+    }
+  },
+  {
+    $merge: {
+      into: "departmentSummary", 
+      whenMatched: "merge",  
+      whenNotMatched: "insert"  
+    }
+  }
+]).pretty();
