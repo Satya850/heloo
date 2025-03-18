@@ -16,7 +16,7 @@ dob:{
 email:{
 	type:String
 },
-age:{
+ages:{
 	type:Number
 }
 })
